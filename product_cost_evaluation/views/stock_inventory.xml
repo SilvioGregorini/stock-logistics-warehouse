@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_inventory_form_date_valuation" model="ir.ui.view">
+        <field name="name">view.inventory.form.date.valuation</field>
+        <field name="model">stock.inventory</field>
+        <field name="inherit_id" ref="stock.view_inventory_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header/field[@name='state']" position="before">
+                <button name="set_evaluations"
+                        type="object"
+                        attrs="{'invisible': ['|', ('evaluation_count', '!=', 0), ('state', 'in', ['draft', 'cancel'])]}"
+                        class="oe_highlight"
+                        context="{'show_evaluations': 1}"
+                        string="Compute History Vals"/>
+                <button name="set_evaluations"
+                        type="object"
+                        attrs="{'invisible': ['|', ('evaluation_count', '=', 0), ('state', 'in', ['draft', 'cancel'])]}"
+                        class="oe_highlight"
+                        confirm="This will erase every preexisting inventory line and will recreate them anew. Confirm?"
+                        context="{'show_evaluations': 1}"
+                        string="Compute History Vals"/>
+            </xpath>
+            <xpath expr="//sheet/div[@name='button_box']" position="inside">
+                <field name="evaluation_ids" invisible="1"/>
+                <button name="action_view_evaluations"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-cogs"
+                        attrs="{'invisible': [('evaluation_count', '=', 0)]}" groups="base.group_user">
+                    <field name="evaluation_count" widget="statinfo" string="Evaluation Lines"/>
+                </button>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
