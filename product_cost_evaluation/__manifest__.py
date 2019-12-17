@@ -20,5 +20,7 @@
         'security/ir.model.access.csv',
         'views/product_cost_evaluation_history.xml',
         'views/stock_inventory.xml',
+        'views/stock_move.xml',
+        'views/stock_picking.xml',
     ]
 }

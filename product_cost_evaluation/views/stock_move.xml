@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+    <record id="edit_manual_cost" model="ir.ui.view">
+        <field name="name">edit.manual.cost</field>
+        <field name="model">stock.move</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="manual_cost" widget="monetary"/>
+                        <field name="company_currency_id" invisible="1"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="button_save_manual_cost"
+                            type="object"
+                            string="Save"
+                            class="oe_highlight"/>
+                    <button name="button_reset_manual_cost"
+                            type="object"
+                            string="Cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>
