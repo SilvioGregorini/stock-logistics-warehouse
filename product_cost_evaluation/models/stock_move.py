@@ -3,6 +3,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
 from odoo import _, api, fields, models
+from odoo.tools.float_utils import float_is_zero
 
 
 class StockMove(models.Model):
@@ -196,12 +197,18 @@ class StockMove(models.Model):
         if not inv_lines:
             return self.get_purchase_cost()
 
-        return sum(
-            self.convert_unit_price(
-                l.price_subtotal / l.quantity, l.currency_id, l.uom_id
+        invoice_cost = 0
+        dp = self.env['decimal.precision'].precision_get(
+            'Product Unit of Measure'
+        )
+        for line in inv_lines.filtered(
+            lambda l: not float_is_zero(l.quantity, dp)
+        ):
+            line_unit_price = line.price_subtotal / line.quantity
+            invoice_cost += self.convert_unit_price(
+                line_unit_price, line.currency_id, line.uom_id
             )
-            for l in inv_lines
-        ) / len(inv_lines)
+        return invoice_cost / len(inv_lines)
 
     def get_invoice_cost_total(self):
         self.ensure_one()
@@ -216,7 +223,13 @@ class StockMove(models.Model):
         po_line = self.purchase_line_id
         if not po_line:
             return 0
-
+        dp_obj = self.env['decimal.precision']
+        account_dp = dp_obj.precision_get('Account')
+        uom_dp = dp_obj.precision_get('Product Unit of Measure')
+        if float_is_zero(po_line.price_subtotal, account_dp):
+            return 0
+        elif float_is_zero(po_line.product_qty, uom_dp):
+            return 0
         return self.convert_unit_price(
             po_line.price_subtotal / po_line.product_qty,
             po_line.currency_id,
